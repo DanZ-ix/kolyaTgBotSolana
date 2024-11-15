@@ -36,4 +36,4 @@ async def checker():
                 await one_token_call(token, session, market_cap.get("market_cap"))          #TODO  Можно ускорить, если сделать правильные параллельные запросы
                 # coroutines = [one_token_call(t, session) for t in token_list]
             # await asyncio.gather(*coroutines)
-        print("--- %s seconds ---" % (time.time() - start_time))
+        logging.info("--- %s seconds ---" % (time.time() - start_time))
