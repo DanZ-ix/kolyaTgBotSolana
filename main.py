@@ -1,16 +1,35 @@
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from aiogram import types
+from handlers import dp
+from mongodb import mongo_conn
+import asyncio
+from checker import checker
 
 
-# Press the green button in the gutter to run the script.
+
+
+
+
+
+async def set_commands(bot):
+    await bot.set_my_commands([
+        types.BotCommand(command="list_tokens", description="Список отслеживаемых токенов"),
+        types.BotCommand(command="add_token", description="Добавить токен"),
+        types.BotCommand(command="delete_token", description="Удалить токен"),
+        types.BotCommand(command="change_market_cap", description="Изменить маркет кап"),
+        types.BotCommand(command="check_market_cap", description="Узнать текущий маркет кап")
+    ])
+
+
+async def main():
+    from loader import bot
+    await set_commands(bot)
+    await mongo_conn.connect_server()
+
+    await asyncio.gather(dp.start_polling(bot), checker())
+    print("Бот запущен")
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    # asyncio.gather(main(), checker())
+    asyncio.run(main())
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
