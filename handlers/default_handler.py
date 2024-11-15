@@ -41,7 +41,7 @@ async def add_token_int(message: types.Message, state: FSMContext):
 @dp.message(Command("change_market_cap"))
 async def change_market_cap(message: types.Message, state: FSMContext):
     if check_admin(message.from_user.id):
-        await message.answer("Напиши новый маркет кап для отслеживания, введи exit чтобы выйти из редактирования")
+        await message.answer("Напиши новый маркет кап (В долларах) для отслеживания, введи exit чтобы выйти из редактирования")
         await state.set_state(States.CHANGE_MARKET_CAP_STATE)
 
 
