@@ -26,7 +26,10 @@ async def one_token_call(token: str, session: aiohttp.ClientSession, market_cap:
 async def checker():
     while True:
         start_time = time.time()
+
         token_list = mongo_conn.token_list
+        if len(token_list) == 0:
+            await asyncio.sleep(5)
         market_cap = await mongo_conn.get_market_cap()          # Тут тоже можно ускорить
         async with aiohttp.ClientSession() as session:
             for token in token_list:
