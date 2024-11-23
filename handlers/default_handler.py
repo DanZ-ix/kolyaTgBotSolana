@@ -31,8 +31,11 @@ async def add_token(message: types.Message, state: FSMContext):
 async def add_token_int(message: types.Message, state: FSMContext):
     if check_admin(message.from_user.id):
         if message.text.lower() != 'exit':
-            await mongo_conn.add_token(message.text)
-            await message.answer("Токен добавлен")
+            if message.text.endswith('pump'):
+                await mongo_conn.add_token(message.text)
+                await message.answer("Токен добавлен")
+            else:
+                await message.answer("Токен кривой и не добавлен")
         else:
             await message.answer("Токен НЕ добавлен")
         await state.set_state(States.DEFAULT_STATE)
