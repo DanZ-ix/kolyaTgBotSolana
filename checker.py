@@ -24,7 +24,11 @@ async def checker():
             if str(response.content).find('<meta name="robots"') != -1:
                 for id in send_list:
                     await bot.send_message(id, "Аккаунт исчез: " + acc.get('acc'))
-
+                    await asyncio.sleep(3)
+                    await bot.send_message(id, "Аккаунт исчез: " + acc.get('acc'))
+                    await asyncio.sleep(3)
+                    await bot.send_message(id, "Аккаунт исчез: " + acc.get('acc'))
+                    await mongo_conn.delete_acc(acc.get('acc'))
         if is_list_empty:
             await asyncio.sleep(60)
         else:

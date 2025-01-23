@@ -13,9 +13,9 @@ from checker import checker
 
 async def set_commands(bot):
     await bot.set_my_commands([
-        types.BotCommand(command="list_acc", description="Список отслеживаемых токенов"),
-        types.BotCommand(command="add_acc", description="Добавить токен"),
-        types.BotCommand(command="delete_acc", description="Удалить токен")
+        types.BotCommand(command="list_acc", description="Список отслеживаемых аккаунтов"),
+        types.BotCommand(command="add_acc", description="Добавить аккаунт"),
+        types.BotCommand(command="delete_acc", description="Удалить аккаунт")
     ])
 
 
