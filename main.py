@@ -6,11 +6,6 @@ import asyncio
 from checker import checker
 
 
-
-
-
-
-
 async def set_commands(bot):
     await bot.set_my_commands([
         types.BotCommand(command="list_acc", description="Список отслеживаемых аккаунтов"),
