@@ -31,7 +31,7 @@ async def checker():
                         await bot.send_message(id, "Аккаунт исчез: " + acc.get('acc'))
                         await mongo_conn.delete_acc(acc.get('acc'))
             except Exception as e:
-                logging.INFO(e)
+                logging.error(e)
         if is_list_empty:
             await asyncio.sleep(60)
         else:
