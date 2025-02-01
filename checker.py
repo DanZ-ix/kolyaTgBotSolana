@@ -11,7 +11,7 @@ from mongodb import mongo_conn
 
 tg_url = "https://t.me/"
 holder_num = 12
-min_market_cap = 7000#70000
+min_market_cap = 70000
 pumpfun_check_time = 10
 
 
