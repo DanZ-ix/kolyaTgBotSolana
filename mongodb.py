@@ -1,5 +1,5 @@
 import motor.motor_asyncio
-
+import datetime
 
 class mongo_connection:
 
@@ -23,6 +23,13 @@ class mongo_connection:
     def get_acc_list(self):
         acc_list = self.db.accs.find()
         return acc_list
+
+    async def add_new_token(self, token):
+        self.db.tokens.insert_one({"token": token})
+
+    def get_token_list(self):
+        return self.db.tokens.find()
+
 
 
 mongo_conn = mongo_connection()

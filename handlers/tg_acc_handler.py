@@ -24,10 +24,10 @@ async def process_start_command(message: types.Message):
 async def add_token(message: types.Message, state: FSMContext):
     if check_admin(message.from_user.id):
         await message.answer("Напиши acc, который нужно начать отслеживать (без @), введи exit чтобы не добавлять")
-        await state.set_state(States.ADD_TOKEN_STATE)
+        await state.set_state(States.ADD_TG_ACC_STATE)
 
 
-@dp.message(States.ADD_TOKEN_STATE)
+@dp.message(States.ADD_TG_ACC_STATE)
 async def add_token_int(message: types.Message, state: FSMContext):
     if check_admin(message.from_user.id):
         if message.text.lower() != 'exit':
@@ -45,9 +45,9 @@ async def del_token(message: types.Message, state: FSMContext):
     if check_admin(message.from_user.id):
         k = await get_keyboard_with_acc()
         await message.answer("Выбери acc, который нужно перестать отслеживать", reply_markup=k)
-        await state.set_state(States.DELETE_TOKEN_STATE)
+        await state.set_state(States.DELETE_TG_ACC_STATE)
 
-@dp.callback_query(States.DELETE_TOKEN_STATE)
+@dp.callback_query(States.DELETE_TG_ACC_STATE)
 async def callback_data(message: types.CallbackQuery, state: FSMContext):
     try:
         if check_admin(message.from_user.id):
