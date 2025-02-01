@@ -4,7 +4,6 @@ import json
 import time
 import requests
 from datetime import datetime
-from configs import twiiter_token
 
 import aiohttp
 from loader import send_list, logging, bot
