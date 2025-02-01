@@ -11,7 +11,7 @@ from mongodb import mongo_conn
 
 tg_url = "https://t.me/"
 holder_num = 12
-min_market_cap = 70000
+min_market_cap = 7000#70000
 pumpfun_check_time = 10
 
 
@@ -65,7 +65,8 @@ async def checker_pumpfun():
                             await bot.send_message(id, f"Токен с mint = {mint} попал под фильтры "
                                                        f"(Холдеров: {str(holder_num)}, market cap больше чем: {str(min_market_cap)} $)\n"
                                                        f"Ссылка: https://pump.fun/coin/{mint}\n"
-                                                       f"Адрес dev'а:\n<code>{i.get('dev')}</code>", parse_mode='html')
+                                                       f"Адрес dev'а:\n<code>{i.get('dev')}</code>\n"
+                                                       f"Адрес СА: \n<code>{mint}</code>\n", parse_mode='html')
 
         except Exception as e:
             logging.error(e)
