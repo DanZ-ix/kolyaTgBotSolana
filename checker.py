@@ -2,18 +2,20 @@
 import asyncio
 import json
 import time
+from http.client import responses
+
 import requests
-from datetime import datetime
 
 import aiohttp
 from loader import send_list, logging, bot
 from mongodb import mongo_conn
 
 tg_url = "https://t.me/"
-holder_num = 12
+holder_num_filter = 30
+bonding_curve_min_percent = 95
 min_market_cap = 70000
-pumpfun_check_time = 10
-
+pumpfun_check_time = 5
+token_lifetime_filter = 10 # 10 min
 
 async def checker_tg():
     while True:
@@ -48,28 +50,41 @@ async def checker_pumpfun():
 
 
         try:
-            response = requests.get(f"https://advanced-api-v2.pump.fun/coins/list?sortBy=creationTime&marketCapFrom={str(min_market_cap)}&numHoldersFrom={str(holder_num)}&numHoldersTo={str(holder_num)}").json()
-
+            #response = requests.get(f"https://advanced-api-v2.pump.fun/coins/list?sortBy=creationTime&marketCapFrom={str(min_market_cap)}&numHoldersFrom={str(holder_num)}&numHoldersTo={str(holder_num)}").json()
+            response = requests.get("https://advanced-api-v2.pump.fun/coins/about-to-graduate").json()
+            #print(response)
             if len(response) != 0:
-
+                request_current_time = time.time() * 1000
                 token_list = []
                 async for acc in mongo_conn.get_token_list():
                     token_list.append(acc.get("token"))
 
                 for i in response:
-                    mint = i.get("coinMint")
-                    if mint not in token_list:
-                        await mongo_conn.add_new_token(mint)
 
-                        for id in send_list:
-                            await bot.send_message(id, f"Токен с mint = {mint} попал под фильтры "
-                                                       f"(Холдеров: {str(holder_num)}, market cap больше чем: {str(min_market_cap)} $)\n"
-                                                       f"Ссылка: https://pump.fun/coin/{mint}\n"
-                                                       f"Адрес dev'а:\n<code>{i.get('dev')}</code>\n"
-                                                       f"Адрес СА: \n<code>{mint}</code>\n", parse_mode='html')
+                    mint = i.get("coinMint")
+                    token_lifetime = request_current_time - i.get("creationTime")
+                    holders_num = int(i.get("numHolders"))
+                    bonding_curve = float(i.get("bondingCurveProgress"))
+
+                    print(holders_num, bonding_curve, token_lifetime)
+                    if holders_num < holder_num_filter and bonding_curve > bonding_curve_min_percent and token_lifetime < (token_lifetime_filter * 60):
+                        print("filter ok:", holders_num, bonding_curve, token_lifetime)
+                        if mint not in token_list:
+                            await mongo_conn.add_new_token(mint)
+
+                            for id in send_list:
+                                await bot.send_message(id, f"Токен с mint = {mint} попал под фильтры\n"
+                                                           f"Холдеров: {holders_num}\n, "
+                                                           f"Market cap: {i.get('marketCap')} $)\n"
+                                                           f"bonding_curve: {bonding_curve}\n"
+                                                           #f"Прошло времени с момента создания токена (c): {token_lifetime}\n\n"
+                                                           f"Ссылка: https://pump.fun/coin/{mint}\n"
+                                                           f"Адрес dev'а:\n<code>{i.get('dev')}</code>\n"
+                                                           f"Адрес СА: \n<code>{mint}</code>\n", parse_mode='html', disable_web_page_preview=True)
 
         except Exception as e:
             logging.error(e)
+            print(e)
 
         iter_time = (time.time() - start_time)
         if iter_time < pumpfun_check_time:
