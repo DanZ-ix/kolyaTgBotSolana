@@ -66,9 +66,7 @@ async def checker_pumpfun():
                     holders_num = int(i.get("numHolders"))
                     bonding_curve = float(i.get("bondingCurveProgress"))
 
-                    print(holders_num, bonding_curve, token_lifetime)
                     if holders_num < holder_num_filter and bonding_curve > bonding_curve_min_percent and token_lifetime < (token_lifetime_filter * 60):
-                        print("filter ok:", holders_num, bonding_curve, token_lifetime)
                         if mint not in token_list:
                             await mongo_conn.add_new_token(mint)
 
