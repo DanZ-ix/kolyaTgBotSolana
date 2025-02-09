@@ -3,7 +3,7 @@ from aiogram import types
 from handlers import dp
 from mongodb import mongo_conn
 import asyncio
-from checker import checker_tg, checker_pumpfun
+from checker import checker_tg, checker_pumpfun, checker_pumpfun_v2
 
 
 async def set_commands(bot):
@@ -18,7 +18,11 @@ async def main():
     from loader import bot
     await set_commands(bot)
     await mongo_conn.connect_server()
-    await asyncio.gather(dp.start_polling(bot), checker_tg(), checker_pumpfun())
+    await asyncio.gather(dp.start_polling(bot),
+                         checker_tg(),
+                         checker_pumpfun(),
+                         checker_pumpfun_v2()
+                         )
 
     print("Бот запущен")
 
