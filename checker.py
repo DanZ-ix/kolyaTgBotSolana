@@ -18,6 +18,23 @@ min_market_cap = 70000
 pumpfun_check_time = 5
 token_lifetime_filter = 10 # 10 min
 
+
+def format_milliseconds_to_text(milliseconds):
+    total_seconds = round(milliseconds / 1000)
+    minutes = total_seconds // 60
+    seconds = total_seconds % 60
+    # Формируем строку в зависимости от значений
+    if minutes > 0 and seconds > 0:
+        return f"{minutes} минут {seconds} секунд"
+    elif minutes > 0:
+        return f"{minutes} минут"
+    else:
+        return f"{seconds} секунд"
+
+
+
+
+
 async def checker_tg():
     while True:
         start_time = time.time()
@@ -72,9 +89,9 @@ async def checker_pumpfun():
                             for id in send_list:
                                 await bot.send_message(id, f"Токен с mint = {mint} попал под фильтры\n"
                                                            f"Холдеров: {holders_num},\n"
-                                                           f"Market cap: {i.get('marketCap')} $)\n"
+                                                           f"Market cap: {i.get('marketCap')} $\n"
                                                            f"bonding_curve: {bonding_curve}\n"
-                                                           #f"Прошло времени с момента создания токена (c): {token_lifetime}\n\n"
+                                                           f"Прошло времени с момента создания токена: {format_milliseconds_to_text(token_lifetime)}\n\n"
                                                            f"Ссылка: https://pump.fun/coin/{mint}\n"
                                                            f"Адрес dev'а:\n<code>{i.get('dev')}</code>\n"
                                                            f"Адрес СА: \n<code>{mint}</code>\n", parse_mode='html', disable_web_page_preview=True)
@@ -124,7 +141,7 @@ async def checker_pumpfun_v2():
                                                            f"Холдеров: {holders_num},\n"
                                                            f"Market cap: {i.get('marketCap')} $)\n"
                                                            f"bonding_curve: {bonding_curve}\n"
-                                                           f"Прошло времени с момента создания токена (c): {floor(token_lifetime)}\n\n"
+                                                           f"Прошло времени с момента создания токена: {format_milliseconds_to_text(token_lifetime)}\n\n"
                                                            f"Ссылка: https://pump.fun/coin/{mint}\n"
                                                            f"Адрес dev'а:\n<code>{i.get('dev')}</code>\n"
                                                            f"Адрес СА: \n<code>{mint}</code>\n", parse_mode='html', disable_web_page_preview=True)
