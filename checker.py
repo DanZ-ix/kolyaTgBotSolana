@@ -13,7 +13,7 @@ from mongodb import mongo_conn
 
 tg_url = "https://t.me/"
 holder_num_filter = 30
-bonding_curve_min_percent = 95
+bonding_curve_min_percent = 99
 min_market_cap = 70000
 pumpfun_check_time = 5
 token_lifetime_filter = 10 # 10 min
