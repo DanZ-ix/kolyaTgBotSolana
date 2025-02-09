@@ -13,7 +13,7 @@ from mongodb import mongo_conn
 
 tg_url = "https://t.me/"
 holder_num_filter = 30
-bonding_curve_min_percent = 70
+bonding_curve_min_percent = 95
 min_market_cap = 70000
 pumpfun_check_time = 5
 token_lifetime_filter = 10 # 10 min
@@ -49,7 +49,6 @@ async def checker_pumpfun():
     while True:
         start_time = time.time()
 
-
         try:
             #response = requests.get(f"https://advanced-api-v2.pump.fun/coins/list?sortBy=creationTime&numHoldersTo={str(holder_num_filter)}").json()
             response = requests.get("https://advanced-api-v2.pump.fun/coins/about-to-graduate").json()
@@ -61,13 +60,12 @@ async def checker_pumpfun():
                     token_list.append(acc.get("token"))
 
                 for i in response:
-
                     mint = i.get("coinMint")
                     token_lifetime = request_current_time - i.get("creationTime")
                     holders_num = int(i.get("numHolders"))
                     bonding_curve = float(i.get("bondingCurveProgress"))
 
-                    if holders_num < holder_num_filter and bonding_curve > bonding_curve_min_percent and token_lifetime < (token_lifetime_filter * 60):
+                    if holders_num < holder_num_filter and bonding_curve > bonding_curve_min_percent and token_lifetime < (token_lifetime_filter * 60 * 1000):
                         if mint not in token_list:
                             await mongo_conn.add_new_token(mint)
 
@@ -105,7 +103,7 @@ async def checker_pumpfun_v2():
                     holders_num = int(i.get("numHolders"))
                     bonding_curve = float(i.get("bondingCurveProgress"))
 
-                    if bonding_curve > bonding_curve_min_percent and token_lifetime < (token_lifetime_filter * 60):
+                    if bonding_curve > bonding_curve_min_percent and token_lifetime < (token_lifetime_filter * 60 * 1000):
                         token_list_migrating.append(i)
 
                 if len(token_list_migrating) != 0:
