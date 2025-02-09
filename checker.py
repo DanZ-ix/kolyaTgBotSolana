@@ -139,7 +139,7 @@ async def checker_pumpfun_v2():
                             for id in send_list:
                                 await bot.send_message(id, f"Токен с mint = {mint} попал под фильтры(Второй вариант мониторинга)\n"
                                                            f"Холдеров: {holders_num},\n"
-                                                           f"Market cap: {i.get('marketCap')} $)\n"
+                                                           f"Market cap: {i.get('marketCap')} $\n"
                                                            f"bonding_curve: {bonding_curve}\n"
                                                            f"Прошло времени с момента создания токена: {format_milliseconds_to_text(token_lifetime)}\n\n"
                                                            f"Ссылка: https://pump.fun/coin/{mint}\n"
