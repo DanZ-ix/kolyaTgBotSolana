@@ -4,3 +4,4 @@ class States(StatesGroup):
     DEFAULT_STATE = State()
     ADD_TG_ACC_STATE = State()
     DELETE_TG_ACC_STATE = State()
+    WAIT_LINKS = State()

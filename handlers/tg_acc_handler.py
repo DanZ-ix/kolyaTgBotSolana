@@ -2,6 +2,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram import types
 from aiogram.filters import CommandStart, Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import FSInputFile
 
 from loader import dp, bot, admin_list
 from handlers.states import States
@@ -15,10 +16,12 @@ def check_admin(id: int) -> bool:
 
 @dp.message(CommandStart())
 async def process_start_command(message: types.Message):
-    if check_admin(message.from_user.id):
-        await message.answer("Бот для мониторинга аккаунтов ТГ")
-    else:
-        await message.answer("Нет админского доступа")
+    try:
+        photo = FSInputFile("kek.png")
+        mess = await bot.send_photo(chat_id=message.chat.id, photo=photo)
+        print(mess)
+    except Exception as e:
+        print(e)
 
 @dp.message(Command("add_acc"))
 async def add_token(message: types.Message, state: FSMContext):
@@ -37,6 +40,25 @@ async def add_token_int(message: types.Message, state: FSMContext):
             await message.answer("acc НЕ добавлен")
         await state.set_state(States.DEFAULT_STATE)
 
+@dp.message(Command("gen_links"))
+async def gen_links(message: types.Message, state: FSMContext):
+    if check_admin(message.from_user.id):
+        await message.answer("Напишите token mint, exit для выхода")
+        await state.set_state(States.WAIT_LINKS)
+
+@dp.message(States.WAIT_LINKS)
+async def add_token_int(message: types.Message, state: FSMContext):
+    if check_admin(message.from_user.id):
+        if message.text.lower() != 'exit':
+            token_mint = message.text
+            await message.answer(
+                            f"Ссылки:\n\n"
+                                 f"https://pump.fun/coin/{token_mint}\n\n"
+                                 f"https://x.com/search?q={token_mint}\n\n"
+                                 f"https://solscan.io/token/{token_mint}#transactions", disable_web_page_preview=True)
+        else:
+            await message.answer("Выход")
+        await state.set_state(States.DEFAULT_STATE)
 
 
 

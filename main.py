@@ -8,6 +8,7 @@ from checker import checker_tg, checker_pumpfun, checker_pumpfun_v2
 
 async def set_commands(bot):
     await bot.set_my_commands([
+        types.BotCommand(command="gen_links", description="Сгенерировать ссылки на токен"),
         types.BotCommand(command="list_acc", description="Список отслеживаемых аккаунтов ТГ"),
         types.BotCommand(command="add_acc", description="Добавить аккаунт ТГ"),
         types.BotCommand(command="delete_acc", description="Удалить аккаунт ТГ")
@@ -19,12 +20,11 @@ async def main():
     await set_commands(bot)
     await mongo_conn.connect_server()
     await asyncio.gather(dp.start_polling(bot),
-                         checker_tg(),
-                         checker_pumpfun(),
-                         checker_pumpfun_v2()
+                         #checker_tg(),
+                         #checker_pumpfun(),
+                         #checker_pumpfun_v2()
                          )
 
-    print("Бот запущен")
 
 if __name__ == '__main__':
     asyncio.run(main())
