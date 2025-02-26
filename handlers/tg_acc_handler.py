@@ -55,7 +55,8 @@ async def add_token_int(message: types.Message, state: FSMContext):
                             f"Ссылки:\n\n"
                                  f"https://pump.fun/coin/{token_mint}\n\n"
                                  f"https://x.com/search?q={token_mint}\n\n"
-                                 f"https://solscan.io/token/{token_mint}#transactions", disable_web_page_preview=True)
+                                 f"https://solscan.io/token/{token_mint}#transactions\n\n"
+                                 f"https://dexscreener.com/solana/{token_mint}", disable_web_page_preview=True)
         else:
             await message.answer("Выход")
         await state.set_state(States.DEFAULT_STATE)
