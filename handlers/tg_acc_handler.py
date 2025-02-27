@@ -7,7 +7,7 @@ from aiogram.types import FSInputFile
 from loader import dp, bot, admin_list
 from handlers.states import States
 from mongodb import mongo_conn
-
+from uitls import get_links
 
 
 def check_admin(id: int) -> bool:
@@ -51,12 +51,7 @@ async def add_token_int(message: types.Message, state: FSMContext):
     if check_admin(message.from_user.id):
         if message.text.lower() != 'exit':
             token_mint = message.text
-            await message.answer(
-                            f"Ссылки:\n\n"
-                                 f"https://pump.fun/coin/{token_mint}\n\n"
-                                 f"https://x.com/search?q={token_mint}\n\n"
-                                 f"https://solscan.io/token/{token_mint}#transactions\n\n"
-                                 f"https://dexscreener.com/solana/{token_mint}", disable_web_page_preview=True)
+            await message.answer(get_links(token_mint), disable_web_page_preview=True)
         else:
             await message.answer("Выход")
         await state.set_state(States.DEFAULT_STATE)
@@ -100,5 +95,7 @@ async def get_keyboard_with_acc() -> types.InlineKeyboardMarkup:
         keyboard_builder.button(text=acc.get("acc"), callback_data=acc.get("acc"))
     keyboard_builder.adjust(1)
     return keyboard_builder.as_markup()
+
+
 
 

@@ -10,6 +10,7 @@ import requests
 import aiohttp
 from loader import send_list, logging, bot
 from mongodb import mongo_conn
+from uitls import get_links
 
 tg_url = "https://t.me/"
 holder_num_filter = 30
@@ -94,7 +95,8 @@ async def checker_pumpfun():
                                                            f"Прошло времени с момента создания токена: {format_milliseconds_to_text(token_lifetime)}\n\n"
                                                            f"Ссылка: https://pump.fun/coin/{mint}\n"
                                                            f"Адрес dev'а:\n<code>{i.get('dev')}</code>\n"
-                                                           f"Адрес СА: \n<code>{mint}</code>\n", parse_mode='html', disable_web_page_preview=True)
+                                                           f"Адрес СА: \n<code>{mint}</code>\n"
+                                                           f"{get_links(mint)}", parse_mode='html', disable_web_page_preview=True)
 
         except Exception as e:
             logging.error(e)
@@ -144,7 +146,8 @@ async def checker_pumpfun_v2():
                                                            f"Прошло времени с момента создания токена: {format_milliseconds_to_text(token_lifetime)}\n\n"
                                                            f"Ссылка: https://pump.fun/coin/{mint}\n"
                                                            f"Адрес dev'а:\n<code>{i.get('dev')}</code>\n"
-                                                           f"Адрес СА: \n<code>{mint}</code>\n", parse_mode='html', disable_web_page_preview=True)
+                                                           f"Адрес СА: \n<code>{mint}</code>\n"
+                                                           f"{get_links(mint)}", parse_mode='html', disable_web_page_preview=True)
 
         except Exception as e:
             logging.error(e)
