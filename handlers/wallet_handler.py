@@ -55,8 +55,6 @@ Example: /list ETH or just /list
     await message.answer(start_mess)
 
 
-
-
 @dp.message(Command('add'))
 async def add(message: types.Message):
     if not check_admin(message.from_user.id):

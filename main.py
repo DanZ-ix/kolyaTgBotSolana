@@ -21,8 +21,8 @@ async def main():
     await mongo_conn.connect_server()
     await asyncio.gather(dp.start_polling(bot),
                          checker_tg(),
-                         checker_pumpfun(),
-                         checker_pumpfun_v2(),
+                         #checker_pumpfun(),
+                         #checker_pumpfun_v2(),
                          monitor_wallets()
                          )
 
