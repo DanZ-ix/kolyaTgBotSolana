@@ -1,6 +1,7 @@
 
 import asyncio
 import json
+import os
 import time
 from http.client import responses
 from math import floor
@@ -8,7 +9,9 @@ from math import floor
 import requests
 
 import aiohttp
-from loader import send_list, logging, bot
+
+from configs import TELEGRAM_BOT_TOKEN, ETHERSCAN_API_KEY, BSCSCAN_API_KEY
+from loader import send_list, logging, bot, kolya_id
 from mongodb import mongo_conn
 from uitls import get_links
 
@@ -159,3 +162,108 @@ async def checker_pumpfun_v2():
 
 
 
+def send_telegram_notification(message, value, usd_value, tx_hash, blockchain):
+    if blockchain == 'eth':
+        etherscan_link = f'<a href="https://etherscan.io/tx/{tx_hash}">Etherscan</a>'
+    elif blockchain == 'bnb':
+        etherscan_link = f'<a href="https://bscscan.com/tx/{tx_hash}">BscScan</a>'
+    else:
+        raise ValueError('Invalid blockchain specified')
+
+    url = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
+    payload = {'chat_id': f'{kolya_id}', 'text': f'{message}: {etherscan_link}\nValue: {value:.6f} {blockchain.upper()} (${usd_value:.2f})',
+               'parse_mode': 'HTML'}
+    response = requests.post(url, data=payload)
+    logging.error(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Telegram notification sent with message: {message}, value: {value} {blockchain.upper()} (${usd_value:.2f})")
+    return response
+
+
+def get_wallet_transactions(wallet_address, blockchain):
+    if blockchain == 'eth':
+        url = f'https://api.etherscan.io/api?module=account&action=txlist&address={wallet_address}&sort=desc&apikey={ETHERSCAN_API_KEY}'
+    elif blockchain == 'bnb':
+        url = f'https://api.bscscan.com/api?module=account&action=txlist&address={wallet_address}&sort=desc&apikey={BSCSCAN_API_KEY}'
+    else:
+        raise ValueError('Invalid blockchain specified')
+
+    response = requests.get(url)
+    data = json.loads(response.text)
+
+    result = data.get('result', [])
+    if not isinstance(result, list):
+        logging.error(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Error fetching transactions for {wallet_address} on {blockchain.upper()} blockchain: {data}")
+        return []
+
+    return result
+
+
+def monitor_wallets():
+    watched_wallets = set()
+    file_path = "watched_wallets.txt"
+    if not os.path.exists(file_path):
+        open(file_path, 'w').close()
+
+    latest_tx_hashes = {}
+    latest_tx_hashes_path = "latest_tx_hashes.json"
+    if os.path.exists(latest_tx_hashes_path):
+        with open(latest_tx_hashes_path, "r") as f:
+            latest_tx_hashes = json.load(f)
+
+    last_run_time = 0
+    last_run_time_path = "last_run_time.txt"
+    if os.path.exists(last_run_time_path):
+        with open(last_run_time_path, "r") as f:
+            last_run_time = int(f.read())
+
+    while True:
+        try:
+            print("try")
+            # Fetch current ETH and BNB prices in USD from CoinGecko API
+            eth_usd_price_url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cbinancecoin&vs_currencies=usd'
+            response = requests.get(eth_usd_price_url)
+            data = json.loads(response.text)
+            eth_usd_price = data['ethereum']['usd']
+            bnb_usd_price = data['binancecoin']['usd']
+
+            # Read from file
+            with open(file_path, 'r') as f:
+                watched_wallets = set(f.read().splitlines())
+
+            for wallet in watched_wallets:
+                blockchain, wallet_address = wallet.split(':')
+                transactions = get_wallet_transactions(wallet_address, blockchain)
+                for tx in transactions:
+                    tx_hash = tx['hash']
+                    tx_time = int(tx['timeStamp'])
+
+                    if tx_hash not in latest_tx_hashes and tx_time > last_run_time:
+                        if tx['to'].lower() == wallet_address.lower():
+                            value = float(tx['value']) / 10**18 # Convert from wei to ETH or BNB
+                            usd_value = value * (eth_usd_price if blockchain == 'eth' else bnb_usd_price) # Calculate value in USD
+                            message = f'🚨 Incoming transaction detected on {wallet_address}'
+                            send_telegram_notification(message, value, usd_value, tx['hash'], blockchain)
+                            #print(f'\n{message}, Value: {value} {blockchain.upper()}, ${usd_value:.2f}\n')
+                        elif tx['from'].lower() == wallet_address.lower():
+                            value = float(tx['value']) / 10**18 # Convert from wei to ETH or BNB
+                            usd_value = value * (eth_usd_price if blockchain == 'eth' else bnb_usd_price) # Calculate value in USD
+                            message = f'🚨 Outgoing transaction detected on {wallet_address}'
+                            send_telegram_notification(message, value, usd_value, tx['hash'], blockchain)
+                            #print(f'\n{message}, Value: {value} {blockchain.upper()}, ${usd_value:.2f}\n')
+
+                        latest_tx_hashes[tx_hash] = int(tx['blockNumber'])
+
+            # Save latest_tx_hashes to file
+            with open(latest_tx_hashes_path, "w") as f:
+                json.dump(latest_tx_hashes, f)
+
+            # Update last_run_time
+            last_run_time = int(time.time())
+            with open(last_run_time_path, "w") as f:
+                f.write(str(last_run_time))
+
+            # Sleep for 1 minute
+            time.sleep(10)
+        except Exception as e:
+            print(f'An error occurred: {e}')
+            # Sleep for 10 seconds before trying again
+            time.sleep(10)

@@ -14,14 +14,6 @@ def check_admin(id: int) -> bool:
     return str(id) in admin_list
 
 
-@dp.message(CommandStart())
-async def process_start_command(message: types.Message):
-    try:
-        photo = FSInputFile("kek.png")
-        mess = await bot.send_photo(chat_id=message.chat.id, photo=photo)
-        print(mess)
-    except Exception as e:
-        print(e)
 
 @dp.message(Command("add_acc"))
 async def add_token(message: types.Message, state: FSMContext):
