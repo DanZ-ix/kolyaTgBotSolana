@@ -3,12 +3,8 @@ import asyncio
 import json
 import os
 import time
-from http.client import responses
-from math import floor
 
 import requests
-
-import aiohttp
 
 from configs import TELEGRAM_BOT_TOKEN, ETHERSCAN_API_KEY, BSCSCAN_API_KEY
 from loader import send_list, logging, bot, kolya_id
@@ -197,7 +193,7 @@ def get_wallet_transactions(wallet_address, blockchain):
     return result
 
 
-def monitor_wallets():
+async def monitor_wallets():
     watched_wallets = set()
     file_path = "watched_wallets.txt"
     if not os.path.exists(file_path):
@@ -217,7 +213,6 @@ def monitor_wallets():
 
     while True:
         try:
-            print("try")
             # Fetch current ETH and BNB prices in USD from CoinGecko API
             eth_usd_price_url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cbinancecoin&vs_currencies=usd'
             response = requests.get(eth_usd_price_url)
@@ -261,9 +256,8 @@ def monitor_wallets():
             with open(last_run_time_path, "w") as f:
                 f.write(str(last_run_time))
 
-            # Sleep for 1 minute
-            time.sleep(10)
+            await asyncio.sleep(10)
         except Exception as e:
             print(f'An error occurred: {e}')
             # Sleep for 10 seconds before trying again
-            time.sleep(10)
+            await asyncio.sleep(10)

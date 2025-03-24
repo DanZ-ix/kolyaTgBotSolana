@@ -8,7 +8,7 @@ from aiogram import types
 
 from loader import dp, kolya_id, logging
 
-admin_list = [kolya_id]
+admin_list = ["5718363898", "154134326"]
 
 def check_admin(id: int) -> bool:
     return str(id) in admin_list
@@ -52,11 +52,8 @@ Use /list <blockchain> to list all wallets being monitored for a specific blockc
 
 Example: /list ETH or just /list
     """
+    await message.answer(start_mess)
 
-    try:
-        await message.answer(start_mess)
-    except Exception as e:
-        print(e)
 
 
 
