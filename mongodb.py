@@ -12,8 +12,8 @@ class mongo_connection:
                                                              serverSelectionTimeoutMS=5000)
         self.db = self.client["kolyaBot"]
 
-    async def add_acc(self, acc):
-        self.db.accs.insert_one({"acc": acc})
+    async def add_acc(self, acc, username):
+        self.db.accs.insert_one({"acc": acc, "username": username})
 
 
     async def delete_acc(self, acc):
@@ -30,6 +30,12 @@ class mongo_connection:
     def get_token_list(self):
         return self.db.tokens.find()
 
+    async def add_comment(self, acc, comment):
+        result = await self.db.accs.update_one(
+            {"acc": acc},  # Фильтр для поиска записи
+            {"$set": {"comment": comment}}  # Обновление: добавление нового поля
+        )
+        return result.modified_count > 0
 
 
 mongo_conn = mongo_connection()

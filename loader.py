@@ -4,7 +4,7 @@ import logging
 
 from configs import bot_token
 
-send_list = ["5718363898", "1392921102", "154134326"]
+send_list = ["5718363898", "1392921102", "154134326", "7470920094", "59092385"]
 admin_list = send_list
 kolya_id = "5718363898"
 
