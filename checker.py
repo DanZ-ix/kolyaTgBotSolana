@@ -45,13 +45,11 @@ async def checker_tg():
             try:
                 response = requests.get(tg_url + acc.get('acc'))
                 if str(response.content).find('<meta name="robots"') != -1:
-                    for id in send_list:
-                        await bot.send_message(id, "Аккаунт Telegram исчез: " + acc.get('acc'))
+                    for i in range(3):
+                        for id in send_list:
+                            await bot.send_message(id, "Аккаунт Telegram исчез: " + acc.get('acc'))
                         await asyncio.sleep(3)
-                        await bot.send_message(id, "Аккаунт Telegram исчез: " + acc.get('acc'))
-                        await asyncio.sleep(3)
-                        await bot.send_message(id, "Аккаунт Telegram исчез: " + acc.get('acc'))
-                        await mongo_conn.delete_acc(acc.get('acc'))
+                    await mongo_conn.delete_acc(acc.get('acc'))
             except Exception as e:
                 logging.error(e)
         if is_list_empty:

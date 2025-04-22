@@ -23,7 +23,7 @@ async def main():
                          checker_tg(),
                          #checker_pumpfun(),
                          #checker_pumpfun_v2(),
-                         monitor_wallets()
+                         #monitor_wallets()
                          )
 
 
